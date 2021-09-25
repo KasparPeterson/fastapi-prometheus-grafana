@@ -7,6 +7,8 @@ services:
     container_name: app
     ports:
       - 8000:8000
+    volumes:
+      - ./logs:/app/logs # Example volume for logs - mount this into promtail
     networks:
       example-network:
         ipv4_address: 172.16.238.10
@@ -41,6 +43,24 @@ services:
     networks:
       example-network:
         ipv4_address: 172.16.238.12
+
+  loki:
+    image: grafana/loki:2.3.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      example-network:
+        ipv4_address: 172.16.238.13
+
+  promtail:
+    image: grafana/promtail:2.3.0
+    volumes:
+      - ./logs:/var/log
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      example-network:
+        ipv4_address: 172.16.238.14
 
 networks:
   example-network:
